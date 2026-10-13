@@ -1,0 +1,204 @@
+@import 'tailwindcss';
+@import '@fontsource/lilita-one';
+@import '@fontsource-variable/nunito';
+
+/* ---------------------------------------------------------------------------
+ * CR Pocket — "night arena pocket" design tokens (Tailwind v4 theme)
+ * Deep indigo arena base, royal violet primary, gold CTAs, elixir magenta.
+ * ------------------------------------------------------------------------ */
+@theme {
+  --font-display: 'Lilita One', 'Nunito Variable', ui-rounded, system-ui, sans-serif;
+  --font-sans: 'Nunito Variable', ui-sans-serif, system-ui, sans-serif;
+
+  /* Arena base (deep indigo/navy) */
+  --color-night-950: #0a0d26;
+  --color-night-900: #0d1030;
+  --color-night-850: #12163c;
+  --color-night-800: #1a1f4f;
+  --color-night-700: #252b63;
+  --color-night-600: #333c7d;
+  --color-night-500: #4a549c;
+  --color-night-400: #6b76b8;
+
+  /* Royal violet (primary) */
+  --color-royal-200: #c9c0ff;
+  --color-royal-300: #a89bff;
+  --color-royal-400: #8b7dff;
+  --color-royal-500: #6d5cff;
+  --color-royal-600: #5847e8;
+  --color-royal-700: #4536c2;
+  --color-royal-800: #382aa0;
+
+  /* Gold (primary CTA / rewards) */
+  --color-gold-200: #ffedb0;
+  --color-gold-300: #ffd96b;
+  --color-gold-400: #ffc83d;
+  --color-gold-500: #eda92a;
+  --color-gold-600: #c78a12;
+
+  /* Elixir magenta */
+  --color-elixir-200: #f8b8f2;
+  --color-elixir-300: #f093ea;
+  --color-elixir-400: #e14bd8;
+  --color-elixir-500: #c92fc2;
+  --color-elixir-600: #a0219b;
+
+  /* Wild slot teal */
+  --color-wild-300: #7deade;
+  --color-wild-400: #2dd4bf;
+  --color-wild-500: #14b8a6;
+
+  /* Hero / champion amber */
+  --color-hero-300: #ffd08a;
+  --color-hero-400: #ffb020;
+  --color-hero-500: #f59300;
+
+  /* Ink (text) */
+  --color-ink: #eef0ff;
+  --color-ink-dim: #b9c0e8;
+  --color-ink-faint: #8a92c4;
+
+  /* Status */
+  --color-good-400: #4ade80;
+  --color-good-500: #22c55e;
+  --color-bad-300: #fca5a5;
+  --color-bad-400: #f87171;
+  --color-bad-500: #ef4444;
+  --color-bad-600: #c22626;
+
+  /* Radii — chunky but tasteful */
+  --radius-tile: 1.25rem;
+
+  /* Animations */
+  --animate-shimmer: shimmer 1.6s linear infinite;
+  --animate-float: float 5s ease-in-out infinite;
+  --animate-pop-in: pop-in 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  --animate-toast-in: toast-in 0.25s cubic-bezier(0.21, 1.02, 0.73, 1) both;
+
+  @keyframes shimmer {
+    from { background-position: 200% 0; }
+    to { background-position: -200% 0; }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0) rotate(var(--float-rot, 0deg)); }
+    50% { transform: translateY(-8px) rotate(var(--float-rot, 0deg)); }
+  }
+  @keyframes pop-in {
+    from { opacity: 0; transform: scale(0.92) translateY(6px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  @keyframes toast-in {
+    from { opacity: 0; transform: translateY(10px) scale(0.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+}
+
+/* --------------------------------------------------------------------------
+ * Base
+ * ------------------------------------------------------------------------ */
+@layer base {
+  html {
+    color-scheme: dark;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-night-900 font-sans text-ink antialiased;
+    /* Night arena: deep indigo gradient + soft violet glow + vignette */
+    background-image:
+      radial-gradient(120% 70% at 50% -10%, rgb(109 92 255 / 0.16), transparent 60%),
+      radial-gradient(90% 60% at 85% 110%, rgb(225 75 216 / 0.08), transparent 60%),
+      linear-gradient(180deg, #12163c 0%, #0d1030 34%, #0a0d26 100%);
+    background-attachment: fixed;
+    min-height: 100dvh;
+  }
+
+  /* Fine noise overlay (very subtle, static — no overdrawn particles) */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  }
+
+  ::selection {
+    background: rgb(109 92 255 / 0.5);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-gold-400);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  input, textarea, select {
+    font: inherit;
+  }
+}
+
+/* --------------------------------------------------------------------------
+ * Component primitives
+ * ------------------------------------------------------------------------ */
+@layer components {
+  /* Card surface */
+  .surface {
+    @apply rounded-tile border border-white/8 bg-night-800/80;
+    box-shadow:
+      0 1px 0 rgb(255 255 255 / 0.05) inset,
+      0 12px 32px -16px rgb(0 0 0 / 0.6);
+  }
+
+  /* Raised game-button "3D lip" (bottom edge). Pair with active:translate-y */
+  .lip {
+    box-shadow:
+      0 1px 0 rgb(255 255 255 / 0.22) inset,
+      0 -2px 6px rgb(0 0 0 / 0.18) inset,
+      0 4px 0 0 var(--lip-color, rgb(0 0 0 / 0.4)),
+      0 10px 20px -8px rgb(0 0 0 / 0.5);
+  }
+  .lip:active:not(:disabled) {
+    transform: translateY(3px);
+    box-shadow:
+      0 1px 0 rgb(255 255 255 / 0.18) inset,
+      0 1px 0 0 var(--lip-color, rgb(0 0 0 / 0.4)),
+      0 4px 10px -6px rgb(0 0 0 / 0.5);
+  }
+
+  /* Horizontally scrollable strip without visible scrollbar */
+  .no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Shimmer skeleton fill */
+  .shimmer {
+    background-image: linear-gradient(
+      100deg,
+      transparent 20%,
+      rgb(255 255 255 / 0.07) 50%,
+      transparent 80%
+    );
+    background-size: 200% 100%;
+    animation: var(--animate-shimmer);
+  }
+
+  /* Safe-area helpers for installed PWA */
+  .pt-safe { padding-top: env(safe-area-inset-top); }
+  .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+  .pl-safe { padding-left: env(safe-area-inset-left); }
+  .pr-safe { padding-right: env(safe-area-inset-right); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shimmer { animation: none; }
+  .animate-float { animation: none; }
+  .animate-pop-in { animation: none; }
+  .animate-toast-in { animation: none; }
+  .lip, .lip:active:not(:disabled) { transition: none; }
+}

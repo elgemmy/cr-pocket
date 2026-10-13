@@ -1,0 +1,14 @@
+name = "cr-pocket"
+pages_build_output_dir = "./dist"
+compatibility_date = "2026-10-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Secrets (set with `wrangler pages secret put CR_API_TOKEN`, or in `.dev.vars` locally):
+#   CR_API_TOKEN   Supercell developer API token (IP-restricted to the RoyaleAPI proxy, 45.79.218.79)
+# Plain vars:
+[vars]
+# Upstream base for the official Clash Royale API. Default is RoyaleAPI's static-IP
+# proxy (https://docs.royaleapi.com/proxy) because Cloudflare Pages Functions have no
+# fixed outbound IP for Supercell's key allowlist. Point at https://api.clashroyale.com/v1
+# only from infrastructure with an allowlisted static IP.
+CR_API_BASE = "https://proxy.royaleapi.dev/v1"
