@@ -60,6 +60,23 @@ export default defineConfig({
       },
     }),
   ],
+  build: {
+    // The only chunk above the default limit is the lazy, optional Three.js scene.
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        // Long-lived vendor chunks cache well across deploys and keep the app chunk small.
+        manualChunks(id) {
+          if (!id.includes('node_modules')) return undefined;
+          if (/[\\/]node_modules[\\/](three|@react-three)[\\/]/.test(id)) return undefined; // stays in the lazy 3D chunk
+          if (/[\\/]node_modules[\\/](firebase|@firebase)[\\/]/.test(id)) return 'firebase';
+          if (/[\\/]node_modules[\\/](react|react-dom|react-router|scheduler)[\\/]/.test(id)) return 'react';
+          if (/[\\/]node_modules[\\/](motion|framer-motion|motion-dom|motion-utils)[\\/]/.test(id)) return 'motion';
+          return undefined;
+        },
+      },
+    },
+  },
   server: {
     proxy: {
       // `npm run dev:api` serves Pages Functions via wrangler on :8788
