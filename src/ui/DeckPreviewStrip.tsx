@@ -45,7 +45,7 @@ export function DeckPreviewStrip({ cards, layout = 'row', className }: DeckPrevi
           return (
             <CardArt
               key={i}
-              size="sm"
+              size="xs"
               className="w-full"
               role={role}
               state={entry ? 'normal' : 'empty'}
@@ -62,7 +62,7 @@ export function DeckPreviewStrip({ cards, layout = 'row', className }: DeckPrevi
         return (
           <CardArt
             key={i}
-            size="sm"
+            size="xs"
             className="w-full"
             role={role}
             card={entry.card}

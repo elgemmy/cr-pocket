@@ -121,9 +121,6 @@ export default function PlayerPage() {
       {status === 'ready' && profile && (
         <>
           <ProfileHeader summary={profile.summary} />
-          <p className="mt-2 px-1 text-xs text-ink-faint">
-            Card levels, where shown, come from your own saved tag — never theirs.
-          </p>
 
           <section aria-labelledby="current-deck-heading" className="mt-7">
             <h2 id="current-deck-heading" className="font-display text-xl text-ink">

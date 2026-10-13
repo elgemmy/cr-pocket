@@ -155,7 +155,6 @@ export default function ImportPage() {
               saving.
             </p>
           )}
-          <p className="mt-2 text-xs text-ink-faint">Card levels shown are yours, from your saved tag.</p>
 
           <div className="mt-4 flex flex-col gap-2 sm:flex-row">
             <Button variant="gold" fullWidth icon={<BookmarkPlus />} onClick={() => setSaveOpen(true)}>

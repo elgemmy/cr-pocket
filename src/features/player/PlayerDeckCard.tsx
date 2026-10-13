@@ -27,8 +27,7 @@ const FORM_BADGE_LABEL: Record<ActiveForm, string> = { evo: 'Evo', hero: 'Hero',
 
 /**
  * One observed deck of a browsed player (current deck or a recent battle).
- * Card levels shown are the SIGNED-IN user's own levels (their saved tag),
- * never the browsed player's — the page says so next to the section titles.
+ * Ownership hints come from the SIGNED-IN user's own collection, never the browsed player's.
  * Evo/Hero/Champion badges show the forms the player actually had active.
  */
 export function PlayerDeckCard({ played, context, playerTag, playerName, onSave, onOpenInCR }: PlayerDeckCardProps) {

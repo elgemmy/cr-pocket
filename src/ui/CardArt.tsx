@@ -16,7 +16,7 @@ export interface CardArtProps {
   card?: CatalogCard | null;
   /** Active special form; drives the rim + form badge. */
   form?: SlotForm;
-  /** Player's normalized level; null/undefined shows "—". */
+  /** Player's normalized level. null = collection loaded but level unknown ("—"); undefined = no collection, badge hidden. */
   level?: number | null;
   size?: CardArtSize; // 'fill' stretches to the parent grid cell
   /** Slot role — used for empty-slot labels and rim when form is 'base'. */
@@ -37,7 +37,7 @@ export interface CardArtProps {
 }
 
 const sizeClasses: Record<CardArtSize, { box: string; elixir: 'sm' | 'md' | 'lg'; level: string; badge: string }> = {
-  xs: { box: 'w-10', elixir: 'sm', level: 'hidden', badge: 'hidden' },
+  xs: { box: 'w-10', elixir: 'sm', level: 'hidden', badge: 'h-3 px-[3px] text-[0.45rem]' },
   sm: { box: 'w-14', elixir: 'sm', level: 'text-[0.6rem] px-1 py-px', badge: 'h-3.5 px-1 text-[0.55rem]' },
   md: { box: 'w-20', elixir: 'md', level: 'text-[0.65rem] px-1.5 py-0.5', badge: 'h-4 px-1.5 text-[0.6rem]' },
   lg: { box: 'w-28', elixir: 'lg', level: 'text-xs px-2 py-0.5', badge: 'h-5 px-2 text-[0.7rem]' },
@@ -181,7 +181,8 @@ export function CardArt({
 
       {/* level badge (size classes may mark it hidden — `hidden` loses to `inline-flex`,
           so honor it by not rendering at all) */}
-      {state !== 'empty' && !s.level.includes('hidden') && (
+      {/* undefined = no collection loaded at all → no badge; null = collection loaded, level unknown → "—" */}
+      {state !== 'empty' && level !== undefined && !s.level.includes('hidden') && (
         <span
           className={cn(
             'absolute bottom-1 left-1/2 -translate-x-1/2 rounded-full bg-night-950/85 font-display leading-none text-ink tabular-nums ring-1 ring-white/15',
@@ -196,7 +197,8 @@ export function CardArt({
       {badge && !s.badge.includes('hidden') && (
         <span
           className={cn(
-            'absolute top-1 right-1 inline-flex items-center rounded-full font-display leading-none tracking-wide',
+            'absolute inline-flex items-center rounded-full font-display leading-none tracking-wide',
+            size === 'xs' ? 'top-0.5 left-1/2 -translate-x-1/2' : 'top-1 right-1',
             s.badge,
             badge.cls,
           )}
