@@ -14,3 +14,5 @@ ui-debug.log*
 .firebase
 coverage
 .DS_Store
+
+.qa/
