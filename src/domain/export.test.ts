@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   exportLibraryJson,
+  IMPORT_LIMITS,
   LIBRARY_EXPORT_APP,
   LIBRARY_EXPORT_SCHEMA,
   parseLibraryJson,
@@ -134,5 +135,19 @@ describe('parseLibraryJson', () => {
     const res = parseLibraryJson(JSON.stringify({ decks: [short] }));
     expect(res.decks).toHaveLength(0);
     expect(res.skipped[0]?.reason).toContain('8');
+  });
+
+  it('clamps text and category lists to the Firestore rule limits', () => {
+    const deck = {
+      ...completeDeck({ id: 'big' }),
+      name: 'N'.repeat(500),
+      notes: 'x'.repeat(5000),
+      categoryIds: [...Array.from({ length: 80 }, (_, i) => `c${i}`), 'c0', ''],
+    };
+    const out = parseLibraryJson(JSON.stringify({ decks: [deck] })).decks[0]!;
+    expect(out.name).toHaveLength(IMPORT_LIMITS.name);
+    expect(out.notes).toHaveLength(IMPORT_LIMITS.notes);
+    expect(out.categoryIds).toHaveLength(IMPORT_LIMITS.categoryIds);
+    expect(new Set(out.categoryIds).size).toBe(out.categoryIds.length);
   });
 });

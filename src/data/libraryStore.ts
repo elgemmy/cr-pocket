@@ -29,7 +29,10 @@ export interface LibraryState {
 
   saveDeck: (deck: Deck) => void;
   deleteDeck: (id: string) => void;
-  /** Returns the category id (existing one when the name already exists, case-insensitive). */
+  /**
+   * Returns the category id (existing one when the name already exists, case-insensitive),
+   * or '' for a blank name or when MAX_CATEGORIES is reached.
+   */
   upsertCategory: (name: string) => string;
   renameCategory: (id: string, name: string) => void;
   /** Removes the category only; decks keep existing with the id removed from categoryIds. */
@@ -44,6 +47,9 @@ let repo: LibraryRepo | null = null;
 let unsubscribe: (() => void) | null = null;
 
 export const normalizePlayerTag = normalizeTag;
+
+/** Matches the firestore.rules profile limit. */
+export const MAX_CATEGORIES = 100;
 
 function newId(): string {
   return typeof crypto !== 'undefined' && 'randomUUID' in crypto
@@ -74,6 +80,7 @@ export const useLibrary = create<LibraryState>()((_set, get) => ({
       (c) => c.name.toLowerCase() === trimmed.toLowerCase(),
     );
     if (existing) return existing.id;
+    if (get().profile.categories.length >= MAX_CATEGORIES) return '';
     const id = newId();
     repo?.saveProfile({ categories: [...get().profile.categories, { id, name: trimmed }] });
     return id;

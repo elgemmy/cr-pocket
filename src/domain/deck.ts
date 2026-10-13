@@ -497,7 +497,9 @@ export function deckSignature(deck: Deck): string {
     .filter((s): s is DeckSlot & { cardId: number } => s.cardId != null)
     .map((s) => `${s.cardId}:${s.form}`)
     .sort();
-  return `${cards.join(';')}|tt:${deck.towerTroopId ?? 'default'}`;
+  // null means "default Tower Princess" across the app, so an explicit Princess id is the same variant.
+  const tt = deck.towerTroopId == null || deck.towerTroopId === TOWER_PRINCESS_ID ? 'default' : deck.towerTroopId;
+  return `${cards.join(';')}|tt:${tt}`;
 }
 
 /** First library deck that is the same variant as `candidate` (ignoring its own id). */

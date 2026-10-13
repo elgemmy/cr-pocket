@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { useAuth } from './auth';
 import {
   bindLibraryToAuth,
+  MAX_CATEGORIES,
   normalizePlayerTag,
   startLibrary,
   stopLibrary,
@@ -58,6 +59,15 @@ describe('libraryStore (demo mode)', () => {
     expect(useLibrary.getState().upsertCategory('  ladder  ')).toBe(id);
     expect(useLibrary.getState().profile.categories).toEqual([{ id, name: 'Ladder' }]);
     expect(useLibrary.getState().upsertCategory('   ')).toBe('');
+  });
+
+  it('upsertCategory refuses new categories past MAX_CATEGORIES but still reuses existing ones', () => {
+    startLibrary('demo-user');
+    for (let i = 0; i < MAX_CATEGORIES; i++) useLibrary.getState().upsertCategory(`Cat ${i}`);
+    expect(useLibrary.getState().profile.categories).toHaveLength(MAX_CATEGORIES);
+    expect(useLibrary.getState().upsertCategory('One too many')).toBe('');
+    expect(useLibrary.getState().upsertCategory('cat 0')).toBeTruthy();
+    expect(useLibrary.getState().profile.categories).toHaveLength(MAX_CATEGORIES);
   });
 
   it('renameCategory renames; deleteCategory strips the id from decks without deleting them', () => {

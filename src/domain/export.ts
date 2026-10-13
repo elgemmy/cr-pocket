@@ -46,6 +46,9 @@ function importFail(error: NonNullable<LibraryImportResult['error']>): LibraryIm
   return { ok: false, error, decks: [], profile: null, skipped: [] };
 }
 
+/** Mirror firestore.rules limits so an imported deck can always be saved. */
+export const IMPORT_LIMITS = { name: 80, notes: 1000, categoryIds: 50 } as const;
+
 const FORMS: ReadonlySet<string> = new Set<SlotForm>(['base', 'evo', 'hero', 'champion']);
 const SOURCE_KINDS: ReadonlySet<string> = new Set(['manual', 'link', 'player']);
 
@@ -106,16 +109,20 @@ function sanitizeDeck(raw: unknown, index: number, now: number): Deck | SkippedE
 
   const towerTroopId = raw['towerTroopId'];
   const categoryIds = Array.isArray(raw['categoryIds'])
-    ? raw['categoryIds'].filter((c): c is string => typeof c === 'string')
+    ? [...new Set(raw['categoryIds'].filter((c): c is string => typeof c === 'string' && c.length > 0))].slice(
+        0,
+        IMPORT_LIMITS.categoryIds,
+      )
     : [];
+  const rawName = typeof raw['name'] === 'string' ? raw['name'].trim() : '';
   const createdAt = typeof raw['createdAt'] === 'number' && Number.isFinite(raw['createdAt']) ? raw['createdAt'] : now;
   const updatedAt = typeof raw['updatedAt'] === 'number' && Number.isFinite(raw['updatedAt']) ? raw['updatedAt'] : now;
 
   return {
     id: raw['id'],
     schemaVersion: 1,
-    name: typeof raw['name'] === 'string' && raw['name'].length > 0 ? raw['name'] : 'Imported deck',
-    notes: typeof raw['notes'] === 'string' ? raw['notes'] : '',
+    name: rawName.length > 0 ? rawName.slice(0, IMPORT_LIMITS.name) : 'Imported deck',
+    notes: typeof raw['notes'] === 'string' ? raw['notes'].slice(0, IMPORT_LIMITS.notes) : '',
     favorite: raw['favorite'] === true,
     slots,
     towerTroopId:

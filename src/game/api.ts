@@ -6,7 +6,7 @@
  */
 
 import { gameApiMode } from '@/config';
-import { normalizeTag } from '@shared/normalize';
+import { normalizeBattleDecks, normalizeCatalog, normalizePlayer, normalizeTag } from '@shared/normalize';
 import type { ApiErrorBody, ApiErrorCode, Catalog, PlayerBattleDecks, PlayerProfile } from '@shared/types';
 import type { ScBattleLog, ScCardsResponse, ScPlayer } from '@shared/supercell';
 
@@ -115,7 +115,6 @@ export const gameApi = {
   async getCatalog(): Promise<Catalog> {
     if (gameApiMode === 'live') return liveGet<Catalog>('/api/cards');
     await demoLatency();
-    const { normalizeCatalog } = await import('@shared/normalize');
     const raw = (await import('@shared/fixtures/cards.json')).default as ScCardsResponse;
     return normalizeCatalog(raw, 'demo');
   },
@@ -125,7 +124,6 @@ export const gameApi = {
       const normalized = demoTag(tag); // validation is client-side too; server re-validates
       return liveGet<PlayerProfile>(`/api/players/${encodeURIComponent(normalized)}`);
     }
-    const { normalizePlayer } = await import('@shared/normalize');
     return normalizePlayer(await demoPlayer(tag), 'demo');
   },
 
@@ -134,7 +132,6 @@ export const gameApi = {
       const normalized = demoTag(tag);
       return liveGet<PlayerBattleDecks>(`/api/players/${encodeURIComponent(normalized)}/battles`);
     }
-    const { normalizeBattleDecks } = await import('@shared/normalize');
     const { tag: normalized, log } = await demoBattles(tag);
     return normalizeBattleDecks(log, normalized, 'demo');
   },

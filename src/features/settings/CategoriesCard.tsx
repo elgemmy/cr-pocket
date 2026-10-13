@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Check, FolderOpen, Pencil, Plus, Trash2, X } from 'lucide-react';
-import { useLibrary } from '@/data/libraryStore';
+import { MAX_CATEGORIES, useLibrary } from '@/data/libraryStore';
 import type { Category } from '@/domain/types';
 import { Button, ConfirmDialog, IconButton, toast } from '@/ui';
 
@@ -118,6 +118,7 @@ export function CategoriesCard() {
     const id = upsertCategory(name);
     setDraft('');
     if (id) toast.success(`Category “${name}” created`);
+    else toast.error(`You can have up to ${MAX_CATEGORIES} categories`);
   };
 
   return (

@@ -103,6 +103,14 @@ export function CardArt({
 }: CardArtProps) {
   const [imgFailed, setImgFailed] = useState(false);
   const [usedFallback, setUsedFallback] = useState(false);
+  // Reset failure state during render (not in an effect) so a reused CardArt never flashes the old failure.
+  const [srcKey, setSrcKey] = useState(`${src ?? ''}|${fallbackSrc ?? ''}`);
+  const nextSrcKey = `${src ?? ''}|${fallbackSrc ?? ''}`;
+  if (nextSrcKey !== srcKey) {
+    setSrcKey(nextSrcKey);
+    setImgFailed(false);
+    setUsedFallback(false);
+  }
   const s = sizeClasses[size];
 
   const effectiveSrc = imgFailed ? (usedFallback ? null : (fallbackSrc ?? null)) : (src ?? null);

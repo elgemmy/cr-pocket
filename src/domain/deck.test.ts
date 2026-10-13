@@ -432,7 +432,13 @@ describe('deckSignature / findDuplicate', () => {
     const b = { ...completeDeck(), towerTroopId: 159000001 };
     const c = completeDeck(); // null tower troop
     expect(deckSignature(a)).not.toBe(deckSignature(b));
-    expect(deckSignature(a)).not.toBe(deckSignature(c));
+    expect(deckSignature(c)).not.toBe(deckSignature(b));
+  });
+
+  it('an explicit Tower Princess equals the default (null) tower troop', () => {
+    const explicit = { ...completeDeck(), towerTroopId: TOWER_PRINCESS_ID };
+    const implicit = completeDeck();
+    expect(deckSignature(explicit)).toBe(deckSignature(implicit));
   });
 
   it('findDuplicate ignores the candidate itself', () => {

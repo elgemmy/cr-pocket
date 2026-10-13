@@ -3,6 +3,7 @@ import { bindLibraryToAuth, useLibrary } from '@/data/libraryStore';
 import { useCatalog } from '@/game/catalogStore';
 import { useMyCollection } from '@/game/myCollectionStore';
 import type { SyncPillState } from '@/ui/SyncPill';
+import { claimLocalUserData } from './localUserData';
 
 let started = false;
 
@@ -19,13 +20,22 @@ export function startSession(): void {
   void useCatalog.getState().load();
 
   let lastUid: string | null = null;
-  useAuth.subscribe((auth) => {
+  let lastAccountKey: string | null = null;
+  const syncAccount = (auth: ReturnType<typeof useAuth.getState>) => {
     const uid = auth.user?.uid ?? null;
     if (uid !== lastUid) {
       if (lastUid !== null) useMyCollection.getState().reset();
       lastUid = uid;
     }
-  });
+    const accountKey = `${auth.status}:${uid ?? ''}`;
+    if (accountKey !== lastAccountKey) {
+      lastAccountKey = accountKey;
+      if (auth.status === 'signedIn') claimLocalUserData(uid);
+      else if (auth.status === 'signedOut') claimLocalUserData(null);
+    }
+  };
+  useAuth.subscribe(syncAccount);
+  syncAccount(useAuth.getState());
 
   let lastTag: string | null | undefined;
   const syncCollection = (lib: ReturnType<typeof useLibrary.getState>) => {

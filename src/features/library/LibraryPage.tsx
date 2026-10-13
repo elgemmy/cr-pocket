@@ -12,7 +12,7 @@ import {
   Trash2,
   Wand2,
 } from 'lucide-react';
-import { useLibrary } from '@/data/libraryStore';
+import { MAX_CATEGORIES, useLibrary } from '@/data/libraryStore';
 import { normalizeTag } from '@/domain/tag';
 import type { Category, Deck } from '@/domain/types';
 import { useCardContext } from '@/features/common/cards';
@@ -382,6 +382,8 @@ export default function LibraryPage() {
           if (id) {
             setView({ kind: 'category', id });
             toast.success(`Category “${name}” ready`);
+          } else if (name.trim()) {
+            toast.error(`You can have up to ${MAX_CATEGORIES} categories`);
           }
         }}
       />

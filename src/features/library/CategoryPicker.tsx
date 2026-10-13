@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Check, Plus } from 'lucide-react';
-import { useLibrary } from '@/data/libraryStore';
-import { cn } from '@/ui';
+import { MAX_CATEGORIES, useLibrary } from '@/data/libraryStore';
+import { cn, toast } from '@/ui';
 
 export interface CategoryPickerProps {
   /** Selected category ids. */
@@ -28,7 +28,10 @@ export function CategoryPicker({ value, onChange }: CategoryPickerProps) {
     const name = draft.trim();
     if (!name) return;
     const id = upsertCategory(name);
-    if (!id) return;
+    if (!id) {
+      toast.error(`You can have up to ${MAX_CATEGORIES} categories`);
+      return;
+    }
     if (!value.includes(id)) onChange([...value, id]);
     setDraft('');
   };
