@@ -1,0 +1,16 @@
+node_modules
+dist
+dev-dist
+.wrangler
+*.local
+.env
+.env.*
+!.env.example
+.dev.vars
+*.log
+firebase-debug.log*
+firestore-debug.log*
+ui-debug.log*
+.firebase
+coverage
+.DS_Store

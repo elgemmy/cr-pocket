@@ -1,0 +1,10 @@
+name = "cr-pocket"
+pages_build_output_dir = "./dist"
+compatibility_date = "2026-10-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Secrets (set with `wrangler pages secret put <NAME>` or in .dev.vars locally):
+#   CR_API_TOKEN   Supercell developer API token (restricted to the proxy's IP)
+# Plain vars:
+[vars]
+CR_API_BASE = "https://proxy.royaleapi.dev/v1"
