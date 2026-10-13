@@ -17,6 +17,9 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
+      // Registration happens in src/app/pwa/PwaToasts.tsx via useRegisterSW so
+      // the app can surface "ready to work offline" feedback.
+      injectRegister: false,
       includeAssets: ['favicon.svg', 'icons/*.png'],
       manifest: {
         name: 'CR Pocket',
@@ -34,6 +37,9 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+        cleanupOutdatedCaches: true,
+        // SPA: serve the precached shell for navigations when offline.
+        navigateFallback: 'index.html',
         navigateFallbackDenylist: [/^\/api\//],
         runtimeCaching: [
           {

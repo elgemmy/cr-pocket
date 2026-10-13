@@ -11,7 +11,8 @@ import PlayerPage from '@/features/player/PlayerPage';
 import ImportPage from '@/features/import/ImportPage';
 import SettingsPage from '@/features/settings/SettingsPage';
 import { useAuth } from '@/data/auth';
-import { CardStackHero } from '@/ui/CardStackHero';
+import { HeroScene } from '@/scene3d';
+import { PwaToasts } from '@/app/pwa';
 
 function SignedInApp() {
   const user = useAuth((s) => s.user);
@@ -47,7 +48,7 @@ function AuthGate() {
       loading={status === 'loading'}
       error={error}
       demoMode={mode === 'demo'}
-      hero={<CardStackHero />}
+      hero={<HeroScene variant="signin" />}
     />
   );
 }
@@ -58,6 +59,7 @@ export default function App() {
       <BrowserRouter>
         <AuthGate />
         <ToastViewport />
+        <PwaToasts />
       </BrowserRouter>
     </MotionConfig>
   );
