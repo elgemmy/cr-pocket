@@ -1,0 +1,75 @@
+rules_version = '2';
+
+// CR Pocket — default deny; per-user library under users/{uid}.
+// Firebase UID is the ONLY ownership identity; a Clash Royale player tag is just
+// profile data and never grants access (spec §6).
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    // ---- profile (users/{uid}) ----
+
+    function validPlayerTag(tag) {
+      return tag == null
+        || (tag is string
+            && tag.size() <= 16
+            // Supercell tag charset (no B, I, O, ...): 0289CGJLPQRUVY, normalized
+            // uppercase with a single leading '#'.
+            && tag.matches('^#[0289CGJLPQRUVY]{2,15}$'));
+    }
+
+    function validProfile() {
+      let d = request.resource.data;
+      return d.keys().hasOnly(['playerTag', 'categories', 'tagPromptDismissed', 'createdAt', 'updatedAt'])
+        && validPlayerTag(d.get('playerTag', null))
+        && d.get('tagPromptDismissed', false) is bool
+        // Rules can't loop, so list *contents* can't be type-checked here; the
+        // client enforces {id, name} shapes and the tests cover size limits.
+        && d.get('categories', []) is list
+        && d.get('categories', []).size() <= 100
+        && (!d.keys().hasAny(['createdAt']) || d.get('createdAt', null) is timestamp)
+        && (!d.keys().hasAny(['updatedAt']) || d.get('updatedAt', null) is timestamp);
+    }
+
+    // ---- deck (users/{uid}/decks/{deckId}) ----
+
+    function validDeck() {
+      let d = request.resource.data;
+      return d.keys().hasOnly(['schemaVersion', 'name', 'notes', 'favorite', 'slots',
+                               'towerTroopId', 'categoryIds', 'source', 'createdAt', 'updatedAt'])
+        && d.schemaVersion == 1
+        && d.name is string && d.name.size() <= 80
+        && d.notes is string && d.notes.size() <= 1000
+        && d.favorite is bool
+        // Exactly 8 slots; element shape is client-enforced (rules can't loop).
+        && d.slots is list && d.slots.size() == 8
+        && (d.towerTroopId == null || d.towerTroopId is int)
+        && d.categoryIds is list && d.categoryIds.size() <= 50
+        && d.source is map
+        && d.source.keys().hasOnly(['kind', 'playerTag', 'playerName', 'context', 'playedAt'])
+        && d.source.get('kind', '') in ['manual', 'link', 'player']
+        && d.createdAt is number
+        && d.updatedAt is number;
+    }
+
+    match /users/{uid} {
+      allow get, list: if isOwner(uid);
+      allow create, update: if isOwner(uid) && validProfile();
+      allow delete: if isOwner(uid);
+
+      match /decks/{deckId} {
+        allow get, list: if isOwner(uid);
+        allow create, update: if isOwner(uid) && validDeck();
+        allow delete: if isOwner(uid);
+      }
+    }
+
+    // Default deny everything else.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
