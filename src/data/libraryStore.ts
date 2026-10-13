@@ -13,6 +13,7 @@ import { appMode } from '@/config';
 import { useAuth } from './auth';
 import { resetFirestorePersistence } from './firebase';
 import { createRepo, DEFAULT_PROFILE, type LibraryRepo } from './repo';
+import { normalizeTag } from '@shared/normalize';
 
 export type LibraryStatus = 'idle' | 'loading' | 'ready';
 
@@ -42,10 +43,7 @@ export interface LibraryState {
 let repo: LibraryRepo | null = null;
 let unsubscribe: (() => void) | null = null;
 
-export function normalizePlayerTag(tag: string): string | null {
-  const cleaned = tag.trim().toUpperCase().replace(/^#+/, '').replace(/\s+/g, '');
-  return cleaned ? `#${cleaned}` : null;
-}
+export const normalizePlayerTag = normalizeTag;
 
 function newId(): string {
   return typeof crypto !== 'undefined' && 'randomUUID' in crypto
@@ -106,7 +104,9 @@ export const useLibrary = create<LibraryState>()((_set, get) => ({
   },
 
   setPlayerTag(tag) {
-    repo?.saveProfile({ playerTag: tag ? normalizePlayerTag(tag) : null });
+    const normalized = tag ? normalizeTag(tag) : null;
+    if (tag && !normalized) return; // callers validate first; never clear a tag on bad input
+    repo?.saveProfile({ playerTag: normalized });
   },
 
   dismissTagPrompt() {

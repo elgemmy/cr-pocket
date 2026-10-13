@@ -22,9 +22,10 @@ describe('libraryStore (demo mode)', () => {
     stopLibrary();
   });
 
-  it('normalizePlayerTag uppercases and adds a single leading #', () => {
-    expect(normalizePlayerTag('  abc123 ')).toBe('#ABC123');
-    expect(normalizePlayerTag('##p0ly')).toBe('#P0LY');
+  it('normalizePlayerTag uppercases, adds a single leading # and rejects invalid tags', () => {
+    expect(normalizePlayerTag('  2cjv 0ly8p ')).toBe('#2CJV0LY8P');
+    expect(normalizePlayerTag('#p0ly')).toBe('#P0LY');
+    expect(normalizePlayerTag('#ABC123')).toBeNull();
     expect(normalizePlayerTag('')).toBeNull();
     expect(normalizePlayerTag('   ')).toBeNull();
   });
@@ -88,8 +89,10 @@ describe('libraryStore (demo mode)', () => {
 
   it('setPlayerTag normalizes and dismissTagPrompt persists', () => {
     startLibrary('demo-user');
-    useLibrary.getState().setPlayerTag(' p0lygr2ph ');
-    expect(useLibrary.getState().profile.playerTag).toBe('#P0LYGR2PH');
+    useLibrary.getState().setPlayerTag(' p0lygr2pv ');
+    expect(useLibrary.getState().profile.playerTag).toBe('#P0LYGR2PV');
+    useLibrary.getState().setPlayerTag('not a tag!');
+    expect(useLibrary.getState().profile.playerTag).toBe('#P0LYGR2PV');
     useLibrary.getState().setPlayerTag(null);
     expect(useLibrary.getState().profile.playerTag).toBeNull();
     useLibrary.getState().dismissTagPrompt();

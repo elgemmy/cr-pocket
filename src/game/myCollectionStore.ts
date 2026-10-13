@@ -99,6 +99,7 @@ export const useMyCollection = create<MyCollectionState>((set, get) => ({
     });
     try {
       const profile = await gameApi.getPlayer(tag);
+      if (get().tag !== tag) return; // tag changed or reset while in flight
       const savedAt = Date.now();
       writePersisted(tag, { savedAt, collection: profile.collection, towerTroops: profile.towerTroops });
       set({
@@ -109,6 +110,7 @@ export const useMyCollection = create<MyCollectionState>((set, get) => ({
         updatedAt: savedAt,
       });
     } catch (err) {
+      if (get().tag !== tag) return;
       const message = err instanceof GameApiError ? err.message : 'Failed to load your card collection.';
       set({ status: cached ? 'ready' : 'error', error: message });
     }

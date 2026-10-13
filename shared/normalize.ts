@@ -46,8 +46,9 @@ export type DataSource = 'live' | 'demo';
  * `#`, maps the commonly mistyped letter O to digit 0, and validates the alphabet.
  * Returns canonical `#TAG` or null when invalid.
  */
-export function normalizeTag(raw: string): string | null {
-  let t = raw.trim().toUpperCase();
+export function normalizeTag(raw: string | null | undefined): string | null {
+  if (raw == null) return null;
+  let t = raw.replace(/\s+/g, '').toUpperCase();
   if (t.startsWith('#')) t = t.slice(1);
   t = t.replace(/O/g, '0');
   if (!TAG_RE.test(t)) return null;
