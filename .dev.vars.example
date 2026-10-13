@@ -1,0 +1,6 @@
+# Copy to `.dev.vars` for local `wrangler pages dev`. NEVER commit the real file.
+#
+# Supercell developer API token from https://developer.clashroyale.com/
+# The key must allowlist the RoyaleAPI proxy IP 45.79.218.79 (see docs/api-notes.md).
+# Without this, /api/* responds 503 {"error":"not_configured"} — that is expected in demo setups.
+CR_API_TOKEN=
