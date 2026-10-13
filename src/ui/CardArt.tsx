@@ -7,7 +7,7 @@ import { cn } from './cn';
 import { ElixirBadge } from './ElixirBadge';
 import { hoverLift, tapSquash } from './motion';
 
-export type CardArtSize = 'xs' | 'sm' | 'md' | 'lg';
+export type CardArtSize = 'xs' | 'sm' | 'md' | 'lg' | 'fill';
 export type CardArtState = 'normal' | 'selected' | 'empty' | 'dimmed';
 export type CardArtOwnership = 'owned' | 'not_owned' | 'form_locked' | 'unknown';
 
@@ -18,7 +18,7 @@ export interface CardArtProps {
   form?: SlotForm;
   /** Player's normalized level; null/undefined shows "—". */
   level?: number | null;
-  size?: CardArtSize;
+  size?: CardArtSize; // 'fill' stretches to the parent grid cell
   /** Slot role — used for empty-slot labels and rim when form is 'base'. */
   role?: SlotRole;
   state?: CardArtState;
@@ -41,6 +41,8 @@ const sizeClasses: Record<CardArtSize, { box: string; elixir: 'sm' | 'md' | 'lg'
   sm: { box: 'w-14', elixir: 'sm', level: 'text-[0.6rem] px-1 py-px', badge: 'h-3.5 px-1 text-[0.55rem]' },
   md: { box: 'w-20', elixir: 'md', level: 'text-[0.65rem] px-1.5 py-0.5', badge: 'h-4 px-1.5 text-[0.6rem]' },
   lg: { box: 'w-28', elixir: 'lg', level: 'text-xs px-2 py-0.5', badge: 'h-5 px-2 text-[0.7rem]' },
+  /** Stretches to its grid cell (aspect ratio preserved); badge scale of `md`. */
+  fill: { box: 'w-full', elixir: 'md', level: 'text-[0.65rem] px-1.5 py-0.5', badge: 'h-4 px-1.5 text-[0.6rem]' },
 };
 
 /** Rim gradient per effective form/role. */
@@ -177,8 +179,9 @@ export function CardArt({
         <ElixirBadge cost={card?.elixir ?? null} size={s.elixir} className="absolute top-0.5 left-0.5" />
       )}
 
-      {/* level badge */}
-      {state !== 'empty' && (
+      {/* level badge (size classes may mark it hidden — `hidden` loses to `inline-flex`,
+          so honor it by not rendering at all) */}
+      {state !== 'empty' && !s.level.includes('hidden') && (
         <span
           className={cn(
             'absolute bottom-1 left-1/2 -translate-x-1/2 rounded-full bg-night-950/85 font-display leading-none text-ink tabular-nums ring-1 ring-white/15',
@@ -190,7 +193,7 @@ export function CardArt({
       )}
 
       {/* form badge */}
-      {badge && (
+      {badge && !s.badge.includes('hidden') && (
         <span
           className={cn(
             'absolute top-1 right-1 inline-flex items-center rounded-full font-display leading-none tracking-wide',
@@ -233,7 +236,7 @@ export function CardArt({
   );
 
   const frameCls = cn(
-    'relative aspect-[300/358] select-none rounded-[calc(var(--radius-tile)*0.62)] p-[2.5px]',
+    'relative inline-block aspect-[300/358] align-top select-none rounded-[calc(var(--radius-tile)*0.62)] p-[2.5px]',
     rims[rim],
     state === 'empty' && 'border-2 border-dashed border-white/25 bg-white/[0.04] p-0 shadow-none',
     state === 'dimmed' && 'saturate-75',

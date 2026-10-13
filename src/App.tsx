@@ -1,4 +1,4 @@
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router';
+import { createBrowserRouter, Navigate, Route, RouterProvider, Routes } from 'react-router';
 import { MotionConfig } from 'motion/react';
 import { AppLayout } from '@/app/AppLayout';
 import { SignInScreen } from '@/app/SignInScreen';
@@ -53,14 +53,23 @@ function AuthGate() {
   );
 }
 
+function Root() {
+  return (
+    <>
+      <AuthGate />
+      <ToastViewport />
+      <PwaToasts />
+    </>
+  );
+}
+
+// A data router is required for useBlocker (editor unsaved-changes guard); routes stay declarative in SignedInApp.
+const router = createBrowserRouter([{ path: '*', element: <Root /> }]);
+
 export default function App() {
   return (
     <MotionConfig reducedMotion="user">
-      <BrowserRouter>
-        <AuthGate />
-        <ToastViewport />
-        <PwaToasts />
-      </BrowserRouter>
+      <RouterProvider router={router} />
     </MotionConfig>
   );
 }

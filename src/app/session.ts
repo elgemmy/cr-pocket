@@ -28,12 +28,15 @@ export function startSession(): void {
   });
 
   let lastTag: string | null | undefined;
-  useLibrary.subscribe((lib) => {
+  const syncCollection = (lib: ReturnType<typeof useLibrary.getState>) => {
     const tag = lib.status === 'ready' ? lib.profile.playerTag : undefined;
     if (tag === undefined || tag === lastTag) return;
     lastTag = tag;
     void useMyCollection.getState().load(tag);
-  });
+  };
+  useLibrary.subscribe(syncCollection);
+  // The demo repo can emit synchronously during bindLibraryToAuth(), before this subscription exists.
+  syncCollection(useLibrary.getState());
 }
 
 /** Header pill state: demo mode is labelled as such instead of claiming cloud sync. */
