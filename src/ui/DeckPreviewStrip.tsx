@@ -32,7 +32,7 @@ export function DeckPreviewStrip({ cards, layout = 'row', className }: DeckPrevi
   const slots = Array.from({ length: 8 }, (_, i) => cards[i]);
   return (
     <div
-      role="img"
+      role="group"
       aria-label="Deck preview: eight cards"
       className={cn(
         layout === 'row' ? 'grid grid-cols-8 gap-1.5' : 'grid w-fit grid-cols-4 gap-1.5',
